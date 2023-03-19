@@ -12,14 +12,8 @@ class RequestQueue {
 public:
     explicit RequestQueue(const SearchServer& search_server);
 
-
-    // сделаем "обёртки" для всех методов поиска, чтобы сохранять результаты для нашей статистики
     template <typename DocumentPredicate>
-    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate) {
-        std::vector<Document> result = search_server_.FindTopDocuments<DocumentPredicate>(raw_query, document_predicate);
-        NewRequest(result);
-        return result;
-    }
+    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate);
 
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus status);
 
@@ -32,14 +26,19 @@ public:
 
 private:
     struct QueryResult {
+        //В примере решения был TimeStamp
+        //В теории говорилось про хранение запросов, которые привели к пустому ответу.
+        //Название переменной подразумевает резьтат.
+        //Подскажите, пожалуйста, что нужно в этой структуре в будущем? Или мы не вернёмся к ней в будущем?
+
         bool isempty_;
-        //string raw_query_;
-        std::vector<Document> searchresult_;
+        uint64_t timestamp;
+        //string raw_query_; 
+        //std::vector<Document> search_result_;
     };
     std::deque<QueryResult> requests_;
 
     const static int min_in_day_ = 1440;
-    // возможно, здесь вам понадобится что-то ещё
 
     const SearchServer& search_server_;
     size_t clock_ = 0;
@@ -50,3 +49,10 @@ private:
     void NewRequest(const std::vector<Document>& doc);
 
 };
+
+template <typename DocumentPredicate>
+std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentPredicate document_predicate) {
+    std::vector<Document> result = search_server_.FindTopDocuments<DocumentPredicate>(raw_query, document_predicate);
+    NewRequest(result);
+    return result;
+}

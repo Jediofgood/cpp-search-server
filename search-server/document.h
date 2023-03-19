@@ -1,4 +1,5 @@
 #pragma once
+#include<iostream>
 
 struct Document {
     int id;
@@ -14,4 +15,8 @@ enum class DocumentStatus {
     BANNED,
     REMOVED,
 };
+
+std::ostream& operator<<(std::ostream& os, const Document& doc);
+
+void PrintDocument(const Document& document);
 

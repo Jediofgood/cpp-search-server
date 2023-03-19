@@ -10,9 +10,6 @@
 using namespace std::string_literals; //
 
 
-
-
-
 void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
     if (document_id < 0) {
         throw std::invalid_argument("wrong id"s);

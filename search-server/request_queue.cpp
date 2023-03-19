@@ -1,13 +1,9 @@
 #include "request_queue.h"
 
-
 RequestQueue::RequestQueue(const SearchServer& search_server)
     :search_server_(search_server)
 {
 }
-
-
-
 
 std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentStatus status) {
     std::vector<Document>result =search_server_.FindTopDocuments(raw_query, status);
@@ -20,13 +16,13 @@ std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query)
     return result;
 }
 
-
 int RequestQueue::GetNoResultRequests() const {
     return empty_count_;
 }
 
 bool RequestQueue::IsNewDay() {
     if (clock_ >= min_in_day_) {
+        ++clock_;
         return true;
     }
     else {
@@ -43,7 +39,8 @@ void RequestQueue::NewRequest(const std::vector<Document>& doc) {
         if (flag) {
             ++empty_count_;
         }
-        toadd.searchresult_ = doc;
+        toadd.timestamp = clock_;
+        //toadd.search_result_ = doc;
         requests_.push_back(toadd);
     }
     else {
@@ -53,7 +50,8 @@ void RequestQueue::NewRequest(const std::vector<Document>& doc) {
         if (flag) {
             ++empty_count_;
         }
-        toadd.searchresult_ = doc;
+        toadd.timestamp = clock_;
+        //toadd.search_result_ = doc;
         if (requests_.front().isempty_) {
             --empty_count_;
         }

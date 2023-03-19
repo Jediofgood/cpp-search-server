@@ -1,9 +1,6 @@
 #pragma once
 
-#include<iostream>
+#include <vector>
+#include <string>
 
-#include"document.h"
-
-std::ostream& operator<<(std::ostream& os, const Document& doc);
-
-void PrintDocument(const Document& document);
+std::vector<std::string> SplitIntoWords(const std::string& text);
