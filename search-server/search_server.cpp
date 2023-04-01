@@ -21,9 +21,13 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
         throw std::invalid_argument("wrong document"s);
     }
     const std::vector<std::string> words = SplitIntoWordsNoStop(document);
+
     const double inv_word_count = 1.0 / words.size();
+
     for (const std::string& word : words) {
         word_to_document_freqs_[word][document_id] += inv_word_count;
+
+        documents_word_freqs_[document_id][word] += inv_word_count;
     }
     documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
     index_.push_back(document_id);
@@ -39,15 +43,6 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 
 size_t SearchServer::GetDocumentCount() const {
     return documents_.size();
-}
-
-int SearchServer::GetDocumentId(int index) const {
-    if (0 <= index and index < GetDocumentCount()) {
-        return index_[index];
-    }
-    else {
-        throw std::out_of_range("if is out ofrange"s);
-    }
 }
 
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query, int document_id) const {
@@ -144,4 +139,44 @@ bool SearchServer::IsValidWord(const std::string& word) {
 
 double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) const {
     return std::log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
+}
+
+const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
+    if (!documents_word_freqs_.count(document_id)) {   //count - O(log(n))
+        throw std::invalid_argument("wrong id"s);
+    }
+    else {
+        return documents_word_freqs_.at(document_id);  //o(1)
+    }
+}
+
+void SearchServer::RemoveDocument(int document_id) {
+
+    if (!documents_word_freqs_.count(document_id)) {   //count - O(log(n))
+       throw std::invalid_argument("wrong id"s);
+    }
+
+    else {
+        //Удалить из?
+        // word_to_document_freqs_; std::map<std::string, std::map<int, double>> word_to_document_freqs_;
+        // documents_word_freqs_; std::map<int, std::map<std::string, double>> documents_word_freqs_;
+        // documents_; +
+        // index_;
+
+
+        documents_.erase(document_id);
+        //проверить lower_bound для большого количества документов.
+        index_.erase(find(index_.begin(), index_.end(), document_id));
+
+        for (const auto& [word, freq] : documents_word_freqs_[document_id]) {
+            word_to_document_freqs_[word].erase(document_id);
+
+            if (!word_to_document_freqs_[word].size()) {
+                word_to_document_freqs_.erase(word);
+            }
+        }
+
+        documents_word_freqs_.erase(document_id); 
+
+    }
 }

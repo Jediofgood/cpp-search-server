@@ -23,6 +23,13 @@ public:
     template <typename StringCollection>
     explicit SearchServer(const StringCollection& stop_words);
 
+    auto begin() const {
+        return index_.begin();
+    }
+
+    auto end() const {
+        return index_.end();
+    }
 
     void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings);
 
@@ -33,9 +40,11 @@ public:
 
     size_t GetDocumentCount() const;
 
-    int GetDocumentId(int index) const;
-
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
+
+    const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
+
+    void RemoveDocument(int document_id);
 
 private:
     //Структуры
@@ -58,7 +67,13 @@ private:
     //Переменные.
 
     std::set<std::string> stop_words_;
+
+    //map<слово, map << документ id, freqs>> 
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
+
+    //
+    std::map<int, std::map<std::string, double>> documents_word_freqs_;
+
     std::map<int, DocumentData> documents_;
     std::vector<int> index_;
 
@@ -96,6 +111,7 @@ SearchServer::SearchServer(const StringCollection& stop_words) {
         }
     }
 }
+
 
 template <typename KeyMapper>
 std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, KeyMapper keymapper) const {
