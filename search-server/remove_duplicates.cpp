@@ -1,4 +1,5 @@
 #include "remove_duplicates.h"
+#include "log_duration.h"
 
 #include <algorithm>
 #include <set>
@@ -6,38 +7,44 @@
 using namespace std::string_literals;
 
 void RemoveDuplicates(SearchServer& search_server) {
-	//std::cout << "Before duplicates removed: "s << search_server.GetDocumentCount() << std::endl;
-	auto right = search_server.end();
-	std::set<int> todel;
+	std::set<int> id_to_delete;
 
-	for (auto left = search_server.begin(); left != right; ++left) {   // по Н. 
+	std::map< std::set< std::string>, std::set<int>> wordsset_idset;
 
-		if (todel.count(*left)) {
-			continue;
+	std::map< int, std::set< std::string>> id_wordsset;
+
+
+	for (int doc_id : search_server) { //O(N)
+		std::set< std::string> words;
+
+		for (const auto& [word, nouseddouble] : search_server.GetWordFrequencies(doc_id)) {	//O(w)
+			words.insert(word);	//log(w)
 		}
 
-		else {
-			const std::map<std::string, double> currmap = search_server.GetWordFrequencies(*left);
+		wordsset_idset[words].insert(doc_id); //Log(N)
+		id_wordsset[doc_id] = words; //Log(N)
+	}//O(N (Log (w) + Log(N))
 
-			for (auto left1 = next(left, 1); left1 != right; ++left1) {
-				const std::map<std::string, double> tocheckmap = search_server.GetWordFrequencies(*left1);
-				
-				if (map_key_cheker(currmap, tocheckmap)) {
-					todel.emplace(*left1);
-				}
+	//сама реализация
+	for (int doc_id : search_server) {	//O(N)
+		if (id_to_delete.count(doc_id)) {
+			continue;
+		}
+		else {
+			const std::set<int>& cheked_id = wordsset_idset[id_wordsset.at(doc_id)];
+			if (cheked_id.size() != 1) {  //O(1)
+				id_to_delete.insert(next(cheked_id.begin(), 1), cheked_id.end()); //В наихудшем случае с учётом цикла - O(N);
 			}
 		}
 	}
 
-	for (int i : todel) {
-		std::cout << "Found duplicate document id "s << i << std::endl;
-		search_server.RemoveDocument(i);
-	}
-	//std::cout << "After duplicates removed: "s << search_server.GetDocumentCount() << std::endl;
-}
 
-bool map_key_cheker(const std::map <std::string, double>& map1, const std::map <std::string, double>& map2) {
-	return map1.size() == map2.size() && std::equal(map1.begin(), map1.end(), map2.begin(), [](auto s1, auto s2) {return s1.first == s2.first; });
+	for (int id : id_to_delete) {
+		std::cout << "Found duplicate document id "s << id << std::endl;
+		search_server.RemoveDocument(id);
+	}
+	//
+	//std::cout << "After duplicates removed: "s << search_server.GetDocumentCount() << std::endl;
 }
 
 

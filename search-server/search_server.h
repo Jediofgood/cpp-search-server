@@ -75,7 +75,7 @@ private:
     std::map<int, std::map<std::string, double>> documents_word_freqs_;
 
     std::map<int, DocumentData> documents_;
-    std::vector<int> index_;
+    std::set<int> index_;
 
     //Функции
 

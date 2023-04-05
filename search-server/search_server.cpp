@@ -30,7 +30,7 @@ void SearchServer::AddDocument(int document_id, const std::string& document, Doc
         documents_word_freqs_[document_id][word] += inv_word_count;
     }
     documents_.emplace(document_id, DocumentData{ ComputeAverageRating(ratings), status });
-    index_.push_back(document_id);
+    index_.emplace(document_id);
 }
 
 std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentStatus status1) const {
@@ -142,21 +142,13 @@ double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) con
 }
 
 const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-    if (!documents_word_freqs_.count(document_id)) {   //count - O(log(n))
-        throw std::invalid_argument("wrong id"s);
-    }
-    else {
-        return documents_word_freqs_.at(document_id);  //o(1)
-    }
+    const static std::map<std::string, double> emptymap;
+    return (documents_word_freqs_.count(document_id) ? documents_word_freqs_.at(document_id) : emptymap);
 }
 
 void SearchServer::RemoveDocument(int document_id) {
 
-    if (!documents_word_freqs_.count(document_id)) {   //count - O(log(n))
-       throw std::invalid_argument("wrong id"s);
-    }
-
-    else {
+    if (documents_word_freqs_.count(document_id)) {   //count - O(log(n))
         //Удалить из?
         // word_to_document_freqs_; std::map<std::string, std::map<int, double>> word_to_document_freqs_;
         // documents_word_freqs_; std::map<int, std::map<std::string, double>> documents_word_freqs_;
