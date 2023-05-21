@@ -26,15 +26,8 @@ public:
 
 private:
     struct QueryResult {
-        //В примере решения был TimeStamp
-        //В теории говорилось про хранение запросов, которые привели к пустому ответу.
-        //Название переменной подразумевает резьтат.
-        //Подскажите, пожалуйста, что нужно в этой структуре в будущем? Или мы не вернёмся к ней в будущем?
-
         bool isempty_;
         uint64_t timestamp;
-        //string raw_query_; 
-        //std::vector<Document> search_result_;
     };
     std::deque<QueryResult> requests_;
 

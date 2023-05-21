@@ -6,7 +6,7 @@ RequestQueue::RequestQueue(const SearchServer& search_server)
 }
 
 std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentStatus status) {
-    std::vector<Document>result =search_server_.FindTopDocuments(raw_query, status);
+    std::vector<Document>result = search_server_.FindTopDocuments(raw_query, status);
     NewRequest(result);
     return result;
 }
