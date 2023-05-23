@@ -9,10 +9,10 @@ using namespace std::string_literals;
 void RemoveDuplicates(SearchServer& search_server) {
 	std::set<int> id_to_delete;
 
-	std::set<std::set<std::string>> words_set;
+	std::set<std::set<std::string_view>> words_set;
 
 	for (int doc_id : search_server) {
-		std::set< std::string> words;
+		std::set< std::string_view> words;
 
 		for (const auto& [word, nouseddouble] : search_server.GetWordFrequencies(doc_id)) {
 			words.insert(word);

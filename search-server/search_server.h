@@ -20,6 +20,8 @@ const size_t CONURRENT_MAP_TORRENTS = 10;
 
 using namespace std::literals;
 
+using vector_of_matched = std::tuple<std::vector<std::string_view>, DocumentStatus>;
+
 class SearchServer {
 public:
     template <typename StringCollection>
@@ -58,11 +60,11 @@ public:
 
     size_t GetDocumentCount() const;
 
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(const std::string_view raw_query, int document_id) const;
+    vector_of_matched MatchDocument(const std::string_view raw_query, int document_id) const;
 
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(std::execution::sequenced_policy policy, const std::string_view raw_query, int document_id) const;
+    vector_of_matched MatchDocument(std::execution::sequenced_policy policy, const std::string_view raw_query, int document_id) const;
 
-    std::tuple<std::vector<std::string_view>, DocumentStatus> MatchDocument(std::execution::parallel_policy policy, const std::string_view raw_query, int document_id) const;
+    vector_of_matched MatchDocument(std::execution::parallel_policy policy, const std::string_view raw_query, int document_id) const;
 
     const std::map<std::string_view, double>& GetWordFrequencies(int document_id) const;
 

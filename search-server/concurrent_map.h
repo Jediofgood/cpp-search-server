@@ -27,15 +27,14 @@ public:
     };
 
     explicit ConcurrentMap()
-        :limits_(3), buckets_(3){}
+        :buckets_(3){}
 
     explicit ConcurrentMap(size_t bucket_count)
-        :limits_(bucket_count), buckets_(bucket_count)
+        :buckets_(bucket_count)
     {
     }
 
     Access operator[](const Key& key) {
-        //size_t the_key = ;
         Bucket& bucket = buckets_[static_cast<uint64_t>(key) % buckets_.size()];
         return { key, bucket };
     }
@@ -55,6 +54,5 @@ public:
 
 
 private:
-    size_t limits_;
     std::vector<Bucket> buckets_;
 };

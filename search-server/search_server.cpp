@@ -50,7 +50,7 @@ size_t SearchServer::GetDocumentCount() const {
     return documents_.size();
 }
 
-std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(const std::string_view raw_query, int document_id) const {
+vector_of_matched SearchServer::MatchDocument(const std::string_view raw_query, int document_id) const {
     if (!IsValidWord(raw_query)) {
         throw std::invalid_argument("Wrong Words"s);
     }
@@ -195,12 +195,12 @@ void SearchServer::RemoveDocument(int document_id) {
     }
 }
 
-std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(std::execution::sequenced_policy exec, const std::string_view raw_query, int document_id) const {
+vector_of_matched SearchServer::MatchDocument(std::execution::sequenced_policy exec, const std::string_view raw_query, int document_id) const {
     return MatchDocument(raw_query, document_id);
 }
 
 
-std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDocument(std::execution::parallel_policy exec, const std::string_view raw_query, int document_id) const {
+vector_of_matched SearchServer::MatchDocument(std::execution::parallel_policy exec, const std::string_view raw_query, int document_id) const {
     if (!IsValidWord(raw_query)) {
         throw std::invalid_argument("Wrong Words"s);
     }
